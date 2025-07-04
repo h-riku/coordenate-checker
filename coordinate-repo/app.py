@@ -88,7 +88,7 @@ def get_advice(judgment):
 st.set_page_config(page_title="コーディネート診断", layout="centered")
 st.title("👕👖 コーディネートはこーでねーと")
 
-uploaded_file = st.file_uploader("服装画像をアップロードしてください", type=["jpg", "png"])
+uploaded_file = st.file_uploader("服装画像をアップロードしてください(全身が写っているものがいいです)", type=["jpg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file)
