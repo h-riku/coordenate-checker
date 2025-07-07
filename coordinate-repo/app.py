@@ -145,9 +145,9 @@ def generate_alternative_colors(fixed_color_bgr, season, is_top):
     
     if season == "選択なし":
         allowed_keywords = ["無難", "控えめ"]
-        for delta_h in [-90, -45, -20, 20, 45, 90]:
-            for delta_s in [-50, 0, 50]:
-                for delta_v in [-50, 0, 50]:
+        for delta_h in [120, -90, -60, -30, 0, 30, 60, 90, 120]:
+            for delta_s in [120, -90, -60, -30, 0, 30, 60, 90, 120]:
+                for delta_v in [120, -90, -60, -30, 0, 30, 60, 90, 120]:
                     nh, ns, nv = (int(h) + delta_h) % 180, np.clip(int(s) + delta_s, 30, 255), np.clip(int(v) + delta_v, 30, 255)
                     candidate_hsvs.append((nh, ns, nv))
         comp_h = (int(h) + 90) % 180
@@ -173,13 +173,38 @@ def generate_alternative_colors(fixed_color_bgr, season, is_top):
 # 動的にベースカラーを生成する関数
 # ========================
 def get_dynamic_base_colors(v_value):
-    staple_colors = [(205, 220, 235), (130, 70, 20)]
+    """
+    入力色の明度(v_value)に基づき、相性の良いベースカラーのリストを動的に生成する。
+    :param v_value: 入力色の明度 (0-255)
+    :return: BGR色のタプルのリスト
+    """
+    # 明るさに関わらず使いやすい定番色
+    staple_colors = [
+        (205, 220, 235),  # ベージュ
+        (130, 70, 20),    # デニムブルー
+    ]
+    
+    # 入力色が明るい場合 (v_value > 170) は、暗い色をベースにする
     if v_value > 170:
-        dynamic_neutrals = [(128, 128, 128), (80, 40, 0), (50, 50, 50)]
+        dynamic_neutrals = [
+            (128, 128, 128),  # ミドルグレー
+            (80, 40, 0),      # ネイビー
+            (50, 50, 50),     # チャコールグレー
+        ]
+    # 入力色が暗い場合 (v_value < 85) は、明るい色をベースにする
     elif v_value < 85:
-        dynamic_neutrals = [(245, 245, 245), (210, 210, 210)]
+        dynamic_neutrals = [
+            (245, 245, 245),  # オフホワイト
+            (210, 210, 210),  # ライトグレー
+        ]
+    # 中間の明るさの場合は、標準的な組み合わせ
     else:
-        dynamic_neutrals = [(245, 245, 245), (128, 128, 128), (50, 50, 50)]
+        dynamic_neutrals = [
+            (245, 245, 245),  # オフホワイト
+            (128, 128, 128),  # ミドルグレー
+            (50, 50, 50),     # チャコールグレー
+        ]
+        
     return staple_colors + dynamic_neutrals
 
 
