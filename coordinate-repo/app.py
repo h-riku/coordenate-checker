@@ -300,7 +300,7 @@ if uploaded_file:
             else:
                 top_color, bottom_color = get_dominant_color(top_region), get_dominant_color(bottom_region)
                 
-                st.image(image, caption="アップロード画像", use_container_width=True)
+                st.image(image, caption="アップロード画像", use_column_width=True)
 
                 st.markdown(f"""
                 <div style='
@@ -357,45 +357,45 @@ if uploaded_file:
                 with st.expander("💡 別のコーディネート提案を見る"):
                     st.markdown("<h4 style='color:#0078D7; margin-bottom:12px;'>👜 小物やアクセサリーで差し色を加えるなら？</h4>", unsafe_allow_html=True)
                     accent_colors = suggest_accent_color(top_color, bottom_color)
-                    # ここにチェックを追加
-                    if accent_colors: # 差し色がある場合のみカラムを作成
+                    # Add a check here
+                    if accent_colors: # Only create columns if there are accent colors
                         cols = st.columns(len(accent_colors))
                         for i, ac_color in enumerate(accent_colors):
                             with cols[i]:
                                 st.markdown(create_color_chip_html(ac_color, 40), unsafe_allow_html=True)
                                 st.markdown(f"<small style='color:#555;'>差し色案 {i+1}</small>", unsafe_allow_html=True)
                     else:
-                        st.info("差し色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
+                        st.info("差し色の提案はありませんでした。")
 
                     # 代替カラー提案（トップス・ボトムス）
                     
                     st.markdown("<h4 style='color:#0078D7; margin-top:25px; margin-bottom:12px;'>👕 トップスの色を変えたい場合の提案</h4>", unsafe_allow_html=True)
                     alt_tops = generate_alternative_colors(bottom_color, season, is_top=True)
-                    # ここにチェックを追加
-                    if alt_tops: # 代替トップスがある場合のみカラムを作成
+                    # Add a check here
+                    if alt_tops: # Only create columns if there are alternative tops
                         cols = st.columns(len(alt_tops))
                         for i, (color, judgment_alt) in enumerate(alt_tops):
                             with cols[i]:
                                 st.markdown(create_color_chip_html(color, 40), unsafe_allow_html=True)
                                 st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
                     else:
-                        st.info("トップスの代替色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
+                        st.info("トップスの代替色の提案はありませんでした。")
 
                     
                     st.markdown("<h4 style='color:#0078D7; margin-top:25px; margin-bottom:12px;'>👖 ボトムスの色を変えたい場合の提案</h4>", unsafe_allow_html=True)
                     alt_bottoms = generate_alternative_colors(top_color, season, is_top=False)
-                    # ここにチェックを追加
-                    if alt_bottoms: # 代替ボトムスがある場合のみカラムを作成
+                    # Add a check here
+                    if alt_bottoms: # Only create columns if there are alternative bottoms
                         cols = st.columns(len(alt_bottoms))
                         for i, (color, judgment_alt) in enumerate(alt_bottoms):
                             with cols[i]:
                                 st.markdown(create_color_chip_html(color, 40), unsafe_allow_html=True)
                                 st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
                     else:
-                        st.info("ボトムスの代替色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
+                        st.info("ボトムスの代替色の提案はありませんでした。")
 
         else:
-            st.error("⚠️ 画像から人物を検出できませんでした。もっとはっきりした画像をアップロードしてください。")
+            st.error("⚠️ 画像から姿勢ランドマークを検出できませんでした。もっとはっきりした画像をアップロードしてください。")
 
 else:
     st.info("画像をアップロードすると、トップスとボトムスの代表色を判定してコーディネートを評価します。")
