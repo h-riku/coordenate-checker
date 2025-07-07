@@ -140,6 +140,35 @@ def suggest_accent_color(color1_bgr, color2_bgr):
     return [accent_bgr1, accent_bgr2]
 
 # ========================
+# 2つの色が似すぎているかを判定する関数 (新規追加)
+# ========================
+@st.cache_data
+def is_color_too_similar(color1_bgr, color2_bgr, h_threshold=10, s_threshold=20, v_threshold=20):
+    """
+    2つのBGR色がHSV空間で似すぎているかを判定する。
+    :param color1_bgr: 1つ目のBGR色 (タプル)
+    :param color2_bgr: 2つ目のBGR色 (タプル)
+    :param h_threshold: 色相差のしきい値 (0-180)
+    :param s_threshold: 彩度差のしきい値 (0-255)
+    :param v_threshold: 明度差のしきい値 (0-255)
+    :return: 似すぎている場合はTrue、そうでない場合はFalse
+    """
+    hsv1 = cv2.cvtColor(np.uint8([[color1_bgr]]), cv2.COLOR_BGR2HSV)[0][0]
+    hsv2 = cv2.cvtColor(np.uint8([[color2_bgr]]), cv2.COLOR_BGR2HSV)[0][0]
+
+    h1, s1, v1 = int(hsv1[0]), int(hsv1[1]), int(hsv1[2])
+    h2, s2, v2 = int(hsv2[0]), int(hsv2[1]), int(hsv2[2])
+
+    h_diff = abs(h1 - h2)
+    h_diff = min(h_diff, 180 - h_diff) # 色相は円環状なので、最小差を計算
+
+    s_diff = abs(s1 - s2)
+    v_diff = abs(v1 - v2)
+
+    # 全ての差がしきい値以下の場合、似すぎていると判断
+    return h_diff < h_threshold and s_diff < s_threshold and v_diff < v_threshold
+
+# ========================
 # 代替カラーを提案する関数
 # ========================
 @st.cache_data
@@ -171,6 +200,11 @@ def generate_alternative_colors(fixed_color_bgr, season, is_top):
     # 重複を避け、許容されるキーワードを含む色のみを提案
     for hsv in set(candidate_hsvs):
         new_bgr_tuple = tuple(int(c) for c in cv2.cvtColor(np.uint8([[hsv]]), cv2.COLOR_HSV2BGR)[0][0])
+        
+        # 元の色と似すぎている場合はスキップ
+        if is_color_too_similar(fixed_color_bgr, new_bgr_tuple):
+            continue 
+
         # 新しい色と固定された色の組み合わせで判定
         top_color, bottom_color = (new_bgr_tuple, fixed_color_bgr) if is_top else (fixed_color_bgr, new_bgr_tuple)
         judgment = color_combination_level_improved(top_color, bottom_color)
@@ -397,7 +431,7 @@ if uploaded_file:
         else:
             top_color, bottom_color = get_dominant_color(top_region), get_dominant_color(bottom_region)
             
-            st.image(image, caption="アップロード画像", use_container_width=True) # use_column_width を use_container_width に変更
+            st.image(image, caption="アップロード画像", use_container_width=True)
 
             st.markdown(f"""
             <div style='
@@ -488,5 +522,3 @@ if uploaded_file:
                 else:
                     st.info("ボトムスの代替色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
 
-else:
-    st.info("画像をアップロードすると、トップスとボトムスの代表色を判定してコーディネートを評価します。")
