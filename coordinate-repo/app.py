@@ -143,7 +143,7 @@ def suggest_accent_color(color1_bgr, color2_bgr):
 # 2つの色が似すぎているかを判定する関数
 # ========================
 @st.cache_data
-def is_color_too_similar(color1_bgr, color2_bgr, h_threshold=10, s_threshold=20, v_threshold=20):
+def is_color_too_similar(color1_bgr, color2_bgr, h_threshold=15, s_threshold=25, v_threshold=25):
     """
     2つのBGR色がHSV空間で似すぎているかを判定する。
     :param color1_bgr: 1つ目のBGR色 (タプル)
@@ -184,9 +184,9 @@ def generate_alternative_colors(fixed_color_bgr, season, is_top):
         allowed_keywords = ["無難", "控えめ"] # 季節指定なしの場合はより保守的に
         # 元の色相からの変化、彩度・明度の変化を考慮した候補
         # 探索範囲を広げ、より多くのバリエーションを試す
-        for delta_h in [-120, -90, -60, -30, 0, 30, 60, 90, 120]: # 9段階
-            for delta_s in [-90, -60, -30, 0, 30, 60, 90]:     # 7段階
-                for delta_v in [-90, -60, -30, 0, 30, 60, 90]: # 7段階
+        for delta_h in [-120,-90, -60, -30, 0, 30, 60, 90,-120]: 
+            for delta_s in [-60, -30, 0, 30, 60]:     
+                for delta_v in [-60, -30, 0, 30, 60]: 
                     nh, ns, nv = (int(h) + delta_h) % 180, np.clip(int(s) + delta_s, 30, 255), np.clip(int(v) + delta_v, 30, 255)
                     candidate_hsvs.append((nh, ns, nv))
         # 補色系の候補も追加
