@@ -202,7 +202,7 @@ def create_color_chip_html(bgr_color, size=30):
     """
 
 # ========================
-# スコアに基づいて色を返す関数 (新規追加)
+# スコアに基づいて色を返す関数
 # ========================
 def get_score_color(score):
     if score >= 85:
@@ -357,30 +357,42 @@ if uploaded_file:
                 with st.expander("💡 別のコーディネート提案を見る"):
                     st.markdown("<h4 style='color:#0078D7; margin-bottom:12px;'>👜 小物やアクセサリーで差し色を加えるなら？</h4>", unsafe_allow_html=True)
                     accent_colors = suggest_accent_color(top_color, bottom_color)
-                    cols = st.columns(len(accent_colors))
-                    for i, ac_color in enumerate(accent_colors):
-                        with cols[i]:
-                            st.markdown(create_color_chip_html(ac_color, 40), unsafe_allow_html=True)
-                            st.markdown(f"<small style='color:#555;'>差し色案 {i+1}</small>", unsafe_allow_html=True)
+                    # ここにチェックを追加
+                    if accent_colors: # 差し色がある場合のみカラムを作成
+                        cols = st.columns(len(accent_colors))
+                        for i, ac_color in enumerate(accent_colors):
+                            with cols[i]:
+                                st.markdown(create_color_chip_html(ac_color, 40), unsafe_allow_html=True)
+                                st.markdown(f"<small style='color:#555;'>差し色案 {i+1}</small>", unsafe_allow_html=True)
+                    else:
+                        st.info("差し色の提案はありませんでした。")
 
                     # 代替カラー提案（トップス・ボトムス）
                     
                     st.markdown("<h4 style='color:#0078D7; margin-top:25px; margin-bottom:12px;'>👕 トップスの色を変えたい場合の提案</h4>", unsafe_allow_html=True)
                     alt_tops = generate_alternative_colors(bottom_color, season, is_top=True)
-                    cols = st.columns(len(alt_tops))
-                    for i, (color, judgment_alt) in enumerate(alt_tops):
-                        with cols[i]:
-                            st.markdown(create_color_chip_html(color, 40), unsafe_allow_html=True)
-                            st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
+                    # ここにチェックを追加
+                    if alt_tops: # 代替トップスがある場合のみカラムを作成
+                        cols = st.columns(len(alt_tops))
+                        for i, (color, judgment_alt) in enumerate(alt_tops):
+                            with cols[i]:
+                                st.markdown(create_color_chip_html(color, 40), unsafe_allow_html=True)
+                                st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
+                    else:
+                        st.info("トップスの代替色の提案はありませんでした。")
 
                     
                     st.markdown("<h4 style='color:#0078D7; margin-top:25px; margin-bottom:12px;'>👖 ボトムスの色を変えたい場合の提案</h4>", unsafe_allow_html=True)
                     alt_bottoms = generate_alternative_colors(top_color, season, is_top=False)
-                    cols = st.columns(len(alt_bottoms))
-                    for i, (color, judgment_alt) in enumerate(alt_bottoms):
-                        with cols[i]:
-                            st.markdown(create_color_chip_html(color, 40), unsafe_allow_html=True)
-                            st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
+                    # ここにチェックを追加
+                    if alt_bottoms: # 代替ボトムスがある場合のみカラムを作成
+                        cols = st.columns(len(alt_bottoms))
+                        for i, (color, judgment_alt) in enumerate(alt_bottoms):
+                            with cols[i]:
+                                st.markdown(create_color_chip_html(color, 40), unsafe_allow_html=True)
+                                st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
+                    else:
+                        st.info("ボトムスの代替色の提案はありませんでした。")
 
         else:
             st.error("⚠️ 画像から姿勢ランドマークを検出できませんでした。もっとはっきりした画像をアップロードしてください。")
