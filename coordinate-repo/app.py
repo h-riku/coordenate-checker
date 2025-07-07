@@ -365,7 +365,7 @@ if uploaded_file:
                                 st.markdown(create_color_chip_html(ac_color, 40), unsafe_allow_html=True)
                                 st.markdown(f"<small style='color:#555;'>差し色案 {i+1}</small>", unsafe_allow_html=True)
                     else:
-                        st.info("差し色の提案はありませんでした。")
+                        st.info("差し色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
 
                     # 代替カラー提案（トップス・ボトムス）
                     
@@ -379,7 +379,7 @@ if uploaded_file:
                                 st.markdown(create_color_chip_html(color, 40), unsafe_allow_html=True)
                                 st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
                     else:
-                        st.info("トップスの代替色の提案はありませんでした。")
+                        st.info("トップスの代替色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
 
                     
                     st.markdown("<h4 style='color:#0078D7; margin-top:25px; margin-bottom:12px;'>👖 ボトムスの色を変えたい場合の提案</h4>", unsafe_allow_html=True)
@@ -392,7 +392,7 @@ if uploaded_file:
                                 st.markdown(create_color_chip_html(color, 40), unsafe_allow_html=True)
                                 st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
                     else:
-                        st.info("ボトムスの代替色の提案はありませんでした。")
+                        st.info("ボトムスの代替色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
 
         else:
             st.error("⚠️ 画像から姿勢ランドマークを検出できませんでした。もっとはっきりした画像をアップロードしてください。")
