@@ -140,7 +140,7 @@ def suggest_accent_color(color1_bgr, color2_bgr):
     return [accent_bgr1, accent_bgr2]
 
 # ========================
-# 2つの色が似すぎているかを判定する関数 (新規追加)
+# 2つの色が似すぎているかを判定する関数
 # ========================
 @st.cache_data
 def is_color_too_similar(color1_bgr, color2_bgr, h_threshold=10, s_threshold=20, v_threshold=20):
@@ -173,7 +173,9 @@ def is_color_too_similar(color1_bgr, color2_bgr, h_threshold=10, s_threshold=20,
 # ========================
 @st.cache_data
 def generate_alternative_colors(fixed_color_bgr, season, is_top):
-    suggestions, candidate_hsvs = [], []
+    suggestions = [] # 最終的な提案リスト
+    candidate_hsvs = [] # 探索用のHSV候補リスト
+    
     h, s, v = cv2.cvtColor(np.uint8([[fixed_color_bgr]]), cv2.COLOR_BGR2HSV)[0][0]
     base_colors_bgr = get_dynamic_base_colors(v)
     candidate_hsvs.extend([tuple(cv2.cvtColor(np.uint8([[bgr]]), cv2.COLOR_BGR2HSV)[0][0]) for bgr in base_colors_bgr])
@@ -181,9 +183,10 @@ def generate_alternative_colors(fixed_color_bgr, season, is_top):
     if season == "選択なし":
         allowed_keywords = ["無難", "控えめ"] # 季節指定なしの場合はより保守的に
         # 元の色相からの変化、彩度・明度の変化を考慮した候補
-        for delta_h in [-120, -90, -60, -30, 0, 30, 60, 90, 120]:
-            for delta_s in [-90, -60, -30, 0, 30, 60, 90]:
-                for delta_v in [-90, -60, -30, 0, 30, 60, 90]:
+        # 探索範囲を広げ、より多くのバリエーションを試す
+        for delta_h in [-120, -90, -60, -30, 0, 30, 60, 90, 120]: # 9段階
+            for delta_s in [-90, -60, -30, 0, 30, 60, 90]:     # 7段階
+                for delta_v in [-90, -60, -30, 0, 30, 60, 90]: # 7段階
                     nh, ns, nv = (int(h) + delta_h) % 180, np.clip(int(s) + delta_s, 30, 255), np.clip(int(v) + delta_v, 30, 255)
                     candidate_hsvs.append((nh, ns, nv))
         # 補色系の候補も追加
@@ -198,20 +201,37 @@ def generate_alternative_colors(fixed_color_bgr, season, is_top):
                 candidate_hsvs.append((nh, ns, np.clip(nv + delta_v, 30, 255)))
 
     # 重複を避け、許容されるキーワードを含む色のみを提案
+    # 提案する色同士が似すぎないようにするためのチェックも追加
     for hsv in set(candidate_hsvs):
         new_bgr_tuple = tuple(int(c) for c in cv2.cvtColor(np.uint8([[hsv]]), cv2.COLOR_HSV2BGR)[0][0])
         
-        # 元の色と似すぎている場合はスキップ
+        # 1. 元の色と似すぎている場合はスキップ
         if is_color_too_similar(fixed_color_bgr, new_bgr_tuple):
             continue 
+
+        # 2. すでに提案リストにある色と似すぎている場合はスキップ
+        # suggestionsリスト内の各色と比較
+        is_too_similar_to_existing = False
+        for existing_suggestion, _ in suggestions: # (color, judgment)のタプルからcolorだけを取り出す
+            if is_color_too_similar(existing_suggestion, new_bgr_tuple):
+                is_too_similar_to_existing = True
+                break
+        if is_too_similar_to_existing:
+            continue
 
         # 新しい色と固定された色の組み合わせで判定
         top_color, bottom_color = (new_bgr_tuple, fixed_color_bgr) if is_top else (fixed_color_bgr, new_bgr_tuple)
         judgment = color_combination_level_improved(top_color, bottom_color)
+        
+        # 許容されるキーワードを含む場合のみ追加
         if any(word in judgment for word in allowed_keywords):
             suggestions.append((new_bgr_tuple, judgment))
             
-    # 色が重複するものを排除し、最大5件まで返す
+        # 提案数が5件に達したらループを終了
+        if len(suggestions) >= 5:
+            break
+
+    # 色が重複するものを排除し、最大5件まで返す（set()で重複排除済みだが、念のため）
     return list({s[0]: s for s in suggestions}.values())[:5]
 
 # ========================
@@ -404,7 +424,7 @@ if uploaded_file:
         h, w, _ = img_bgr.shape
         result = pose.process(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB))
 
-        # 姿勢ランドマークが検出されたかどうかのチェック
+        # ランドマークが検出されたかどうかのチェック
         if not result.pose_landmarks:
             st.error("⚠️ 画像から人物を検出できませんでした。もっとはっきりした画像をアップロードしてください。")
             st.stop() # 処理を中断
@@ -492,7 +512,7 @@ if uploaded_file:
                     cols = st.columns(len(accent_colors))
                     for i, ac_color in enumerate(accent_colors):
                         with cols[i]:
-                            st.markdown(create_color_chip_html(ac_color, 2.5), unsafe_allow_html=True) # size_remを直接指定
+                            st.markdown(create_color_chip_html(ac_color, 2.5), unsafe_allow_html=True)
                             st.markdown(f"<small style='color:#555;'>差し色案 {i+1}</small>", unsafe_allow_html=True)
                 else:
                     st.info("差し色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
@@ -505,7 +525,7 @@ if uploaded_file:
                     cols = st.columns(len(alt_tops))
                     for i, (color, judgment_alt) in enumerate(alt_tops):
                         with cols[i]:
-                            st.markdown(create_color_chip_html(color, 2.5), unsafe_allow_html=True) # size_remを直接指定
+                            st.markdown(create_color_chip_html(color, 2.5), unsafe_allow_html=True)
                             st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
                 else:
                     st.info("トップスの代替色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
@@ -517,7 +537,7 @@ if uploaded_file:
                     cols = st.columns(len(alt_bottoms))
                     for i, (color, judgment_alt) in enumerate(alt_bottoms):
                         with cols[i]:
-                            st.markdown(create_color_chip_html(color, 2.5), unsafe_allow_html=True) # size_remを直接指定
+                            st.markdown(create_color_chip_html(color, 2.5), unsafe_allow_html=True)
                             st.markdown(f"<small style='color:#555;'>{judgment_alt}</small>", unsafe_allow_html=True)
                 else:
                     st.info("ボトムスの代替色の提案はありませんでした。(彩度や明度が極端であったりする場合、条件に合う代替色が見つからない場合があります。)")
