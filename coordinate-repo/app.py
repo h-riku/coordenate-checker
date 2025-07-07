@@ -190,8 +190,8 @@ def create_color_chip_html(bgr_color, size=30):
     rgb_color = (bgr_color[2], bgr_color[1], bgr_color[0])
     return f"""
     <div style='
-        display:inline-block; 
-        width:{size}px; height:{size}px; 
+        display:inline-block;
+        width:{size}px; height:{size}px;
         background-color: rgb{rgb_color};
         border-radius: 50%;
         box-shadow: 0 0 8px rgba(0,0,0,0.25);
@@ -206,6 +206,57 @@ def create_color_chip_html(bgr_color, size=30):
 # ========================
 st.set_page_config(page_title="コーディネートはこーでねーと", layout="centered")
 st.title("🎨コーディネートはこーでねーと")
+
+# Global CSS for dark mode compatibility
+st.markdown("""
+<style>
+/* Base text color for light theme */
+body {
+    color: #333; /* Default text color */
+}
+
+/* Adjustments for dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #eee; /* Light text for dark backgrounds */
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: #eee !important; /* Ensure headings are light in dark mode */
+    }
+    p {
+        color: #ddd !important; /* Ensure paragraphs are light in dark mode */
+    }
+    /* Specific adjustments for your custom HTML elements */
+    .stMarkdown div[style*="font-weight:bold; color:#333;"] {
+        color: #eee !important;
+    }
+    .stMarkdown div[style*="background-color:#f5faff;"] {
+        background-color: #2a2a2a !important; /* Darker background for the score card */
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important; /* Adjust shadow for dark theme */
+    }
+    .stMarkdown h2[style*="color:#1E90FF;"] {
+        color: #64B5F6 !important; /* Lighter blue for dark mode headings */
+    }
+    .stMarkdown p[style*="color:#555;"] {
+        color: #bbb !important; /* Lighter grey for advice text */
+    }
+    .stMarkdown small[style*="color:#555;"] {
+        color: #bbb !important; /* Lighter grey for small text */
+    }
+    .stMarkdown h4[style*="color:#0078D7;"] {
+        color: #7EC0EE !important; /* Lighter blue for subheadings */
+    }
+    .st-emotion-cache-1wvtx9b { /* Target the separator line */
+        background-color: #555 !important;
+    }
+     .st-emotion-cache-10qbe6w p { /* Target info message text */
+        color: #eee !important;
+     }
+
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 season = st.selectbox("季節を選んでください (提案される色が変わります)", ["選択なし", "春", "夏", "秋", "冬"])
 uploaded_file = st.file_uploader("服装画像をアップロードしてください(全身が写っている画像を推奨します)", type=["jpg", "png"])
@@ -240,13 +291,13 @@ if uploaded_file:
 
                 st.markdown(f"""
                 <div style='
-                    display:flex; 
-                    align-items:center; 
-                    font-size:18px; 
-                    margin-top:20px; 
+                    display:flex;
+                    align-items:center;
+                    font-size:18px;
+                    margin-top:20px;
                     margin-bottom:15px;
                     font-weight:bold;
-                    color:#333;
+                    color:#333; /* Default for light theme */
                 '>
                     {create_color_chip_html(top_color, 40)} トップスの代表色
                 </div>
@@ -254,12 +305,12 @@ if uploaded_file:
 
                 st.markdown(f"""
                 <div style='
-                    display:flex; 
-                    align-items:center; 
-                    font-size:18px; 
+                    display:flex;
+                    align-items:center;
+                    font-size:18px;
                     margin-bottom:25px;
                     font-weight:bold;
-                    color:#333;
+                    color:#333; /* Default for light theme */
                 '>
                     {create_color_chip_html(bottom_color, 40)} ボトムスの代表色
                 </div>
@@ -271,15 +322,15 @@ if uploaded_file:
                 
                 st.markdown(f"""
                 <div style='
-                    background-color:#f5faff; 
-                    padding:30px; 
-                    border-radius:25px; 
-                    box-shadow: 0 10px 25px rgba(30,144,255,0.2);
+                    background-color:#f5faff; /* Default for light theme */
+                    padding:30px;
+                    border-radius:25px;
+                    box-shadow: 0 10px 25px rgba(30,144,255,0.2); /* Default for light theme */
                     max-width:500px;
                     margin-bottom:40px;
                     font-family:"Helvetica Neue", Arial, sans-serif;
                 '>
-                    <h2 style='color:#1E90FF; margin-bottom:10px; font-weight: bold; font-size:26px;'>コーデスコア: <span style='font-size:50px; color:#FF4500; font-weight:bold;'>{score} 点</span></h2> 
+                    <h2 style='color:#1E90FF; margin-bottom:10px; font-weight: bold; font-size:26px;'>コーデスコア: <span style='font-size:50px; color:#FF4500; font-weight:bold;'>{score} 点</span></h2>
                     <p style='font-weight:bold; font-size:22px; margin:12px 0; color:#333;'>判定: {judgment}</p>
                     <p style='font-style:italic; color:#555; font-size:18px; margin-top:14px;'>{get_advice(judgment)}</p>
                 </div>
@@ -322,4 +373,3 @@ if uploaded_file:
 
 else:
     st.info("画像をアップロードすると、トップスとボトムスの代表色を判定してコーディネートを評価します。")
-
