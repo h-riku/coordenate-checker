@@ -185,8 +185,8 @@ def generate_alternative_colors(fixed_color_bgr, season, is_top):
         # 元の色相からの変化、彩度・明度の変化を考慮した候補
         # 探索範囲を広げ、より多くのバリエーションを試す
         for delta_h in [-120, -105, -90, -75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75, 90, 105, 120]: 
-            for delta_s in [-90, -60, -30, 0, 30, 60, 90]:     
-                for delta_v in [-90, -60, -30, 0, 30, 60, 90]: 
+            for delta_s in [-60, -30, 0, 30, 60]:     
+                for delta_v in [-60, -30, 0, 30, 60]: 
                     nh, ns, nv = (int(h) + delta_h) % 180, np.clip(int(s) + delta_s, 30, 255), np.clip(int(v) + delta_v, 30, 255)
                     candidate_hsvs.append((nh, ns, nv))
         # 補色系の候補も追加
