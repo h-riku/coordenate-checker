@@ -143,7 +143,7 @@ def suggest_accent_color(color1_bgr, color2_bgr):
 # 2つの色が似すぎているかを判定する関数
 # ========================
 @st.cache_data
-def is_color_too_similar(color1_bgr, color2_bgr, h_threshold=15, s_threshold=25, v_threshold=25):
+def is_color_too_similar(color1_bgr, color2_bgr, h_threshold=20, s_threshold=30, v_threshold=30):
     """
     2つのBGR色がHSV空間で似すぎているかを判定する。
     :param color1_bgr: 1つ目のBGR色 (タプル)
