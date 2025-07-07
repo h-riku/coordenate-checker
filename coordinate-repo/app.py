@@ -300,7 +300,7 @@ if uploaded_file:
             else:
                 top_color, bottom_color = get_dominant_color(top_region), get_dominant_color(bottom_region)
                 
-                st.image(image, caption="アップロード画像", use_column_width=True)
+                st.image(image, caption="アップロード画像", use_container_width=True)
 
                 st.markdown(f"""
                 <div style='
