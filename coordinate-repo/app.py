@@ -202,6 +202,19 @@ def create_color_chip_html(bgr_color, size=30):
     """
 
 # ========================
+# スコアに基づいて色を返す関数 (新規追加)
+# ========================
+def get_score_color(score):
+    if score >= 85:
+        return "#28a745"  # Green for excellent scores
+    elif score >= 70:
+        return "#17a2b8"  # Teal for good scores
+    elif score >= 50:
+        return "#ffc107"  # Yellow/Orange for acceptable scores
+    else:
+        return "#dc3545"  # Red for low scores
+
+# ========================
 # Streamlit アプリ本体
 # ========================
 st.set_page_config(page_title="コーディネートはこーでねーと", layout="centered")
@@ -319,6 +332,7 @@ if uploaded_file:
                 # スコア＆判定カード風ボックス
                 score = calculate_detailed_score(top_color, bottom_color)
                 judgment = color_combination_level_improved(top_color, bottom_color)
+                score_display_color = get_score_color(score) # ここでスコアの色を取得
                 
                 st.markdown(f"""
                 <div style='
@@ -330,7 +344,7 @@ if uploaded_file:
                     margin-bottom:40px;
                     font-family:"Helvetica Neue", Arial, sans-serif;
                 '>
-                    <h2 style='color:#1E90FF; margin-bottom:10px; font-weight: bold; font-size:26px;'>コーデスコア: <span style='font-size:50px; color:#FF4500; font-weight:bold;'>{score} 点</span></h2>
+                    <h2 style='color:#1E90FF; margin-bottom:10px; font-weight: bold; font-size:26px;'>コーデスコア: <span style='font-size:50px; color:{score_display_color}; font-weight:bold;'>{score} 点</span></h2>
                     <p style='font-weight:bold; font-size:22px; margin:12px 0; color:#333;'>判定: {judgment}</p>
                     <p style='font-style:italic; color:#555; font-size:18px; margin-top:14px;'>{get_advice(judgment)}</p>
                 </div>
