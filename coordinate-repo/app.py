@@ -181,9 +181,9 @@ def generate_alternative_colors(fixed_color_bgr, season, is_top):
     if season == "選択なし":
         allowed_keywords = ["無難", "控えめ"] # 季節指定なしの場合はより保守的に
         # 元の色相からの変化、彩度・明度の変化を考慮した候補
-        for delta_h in [-90, -60, -30, 0, 30, 60, 90]:
-            for delta_s in [-60, -30, 0, 30, 60]:
-                for delta_v in [-60, -30, 0, 30, 60]:
+        for delta_h in [-120, -90, -60, -30, 0, 30, 60, 90, 120]:
+            for delta_s in [-90, -60, -30, 0, 30, 60, 90]:
+                for delta_v in [-90, -60, -30, 0, 30, 60, 90]:
                     nh, ns, nv = (int(h) + delta_h) % 180, np.clip(int(s) + delta_s, 30, 255), np.clip(int(v) + delta_v, 30, 255)
                     candidate_hsvs.append((nh, ns, nv))
         # 補色系の候補も追加
